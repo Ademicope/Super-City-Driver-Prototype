@@ -5,37 +5,53 @@ using TMPro;
 
 public class GameManager : MonoBehaviour
 {
-    public static GameManager gameManager;
+    public static GameManager singleton;
 
     public CarController carController;
 
     public TextMeshProUGUI speedText, timeText, coinText;
 
-    private float time = 20;
-    private float coin = 0;
+    public float coin = 0;
 
     public bool isGameOver = false;
+    public bool isMoving = false;
 
     // Start is called before the first frame update
     void Start()
     {
-        if (gameManager == null)
+        if (singleton == null)
         {
-            gameManager = this;
+            singleton = this;
         }
+        StartCoroutine(IncreaseCoin());
     }
 
     // Update is called once per frame
     void Update()
     {
         //Debug.Log("Speed is " + carController.carSpeed.ToString("F2"));
-
         speedText.text = "Speed : " + carController.currentSpeed.ToString("F2") + "km/h";
-
+        coinText.text = "Coins: " + coin.ToString();
     }
 
-    public void CheckRules()
+    public void ApplyViolationFee(float fee)
     {
-
+        coin -= fee;
+        Debug.Log("Coin balance: " + coin);
+    }
+    IEnumerator IncreaseCoin()
+    {
+        
+        while (!isGameOver)
+        {
+            coinText.text = "Coin: " + coin;
+            yield return new WaitForSeconds(1);
+            if (carController.currentSpeed > 0)
+            {
+                isMoving = true;
+                coin++;
+            }
+            
+        }
     }
 }

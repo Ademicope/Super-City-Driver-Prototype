@@ -71,7 +71,6 @@ public class CarController : MonoBehaviour
         // Apply motor torque to the rear wheels
         backRight.motorTorque = motorTorque;
         backLeft.motorTorque = motorTorque;
-
         // Simulate rolling friction by reducing speed when no input is given
         ApplyRollingFriction();
     }
