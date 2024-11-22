@@ -9,6 +9,8 @@ public class CameraController : MonoBehaviour
     public Vector3 offset = new Vector3 (0, 0, 0);
     private Vector3 initialAngle, finalAngle;
 
+    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -20,6 +22,6 @@ public class CameraController : MonoBehaviour
     {
         
         transform.position = car.transform.position + offset;
-        transform.rotation = car.transform.rotation;
+        transform.LookAt(car.transform.position);
     }
 }

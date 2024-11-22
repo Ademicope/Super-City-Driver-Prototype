@@ -9,7 +9,12 @@ public class GameManager : MonoBehaviour
 
     public CarController carController;
 
-    public TextMeshProUGUI speedText;
+    public TextMeshProUGUI speedText, timeText, coinText;
+
+    private float time = 20;
+    private float coin = 0;
+
+    public bool isGameOver = false;
 
     // Start is called before the first frame update
     void Start()
@@ -23,9 +28,14 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("Speed is " + carController.carSpeed.ToString("F2"));
+        //Debug.Log("Speed is " + carController.carSpeed.ToString("F2"));
 
-        speedText.text = "Speed : " + carController.carSpeed.ToString("F2");
+        speedText.text = "Speed : " + carController.currentSpeed.ToString("F2") + "km/h";
+
+    }
+
+    public void CheckRules()
+    {
 
     }
 }
