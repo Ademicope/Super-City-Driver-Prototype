@@ -5,31 +5,24 @@ using UnityEngine;
 
 public class CarController : MonoBehaviour
 {
-    [SerializeField]
-    WheelCollider frontRight;
-    [SerializeField]
-    WheelCollider backRight;
-    [SerializeField]
-    WheelCollider frontLeft;
-    [SerializeField]
-    WheelCollider backLeft;
+    [SerializeField] WheelCollider frontRight;
+    [SerializeField] WheelCollider backRight;
+    [SerializeField] WheelCollider frontLeft;
+    [SerializeField] WheelCollider backLeft;
 
-    [SerializeField]
-    Transform frontRightTransform;
-    [SerializeField]
-    Transform backRightTransform;
-    [SerializeField]
-    Transform frontLeftTransform;
-    [SerializeField]
-    Transform backLeftTransform;
+    [SerializeField] Transform frontRightTransform;
+    [SerializeField] Transform backRightTransform;
+    [SerializeField] Transform frontLeftTransform;
+    [SerializeField] Transform backLeftTransform;
 
     private float verticalInput, horizontalInput;
 
     public float maxMotorTorque = 300f;
-    public float acceleration = 300f;
+    //public float acceleration = 300f;
+    public float acceleration = 0f;
     public float brakingForce = 150f;
     public float maxTurnAngle = 30f;
-    public float accelerationRate = 5f;
+    public float accelerationRate = 0f;
     public float maxSpeed = 220f;
 
     private float currentAcceleration = 0;
@@ -52,37 +45,52 @@ public class CarController : MonoBehaviour
     {
         verticalInput = Input.GetAxis("Vertical");
         horizontalInput = Input.GetAxis("Horizontal");
+    }
+
+    public void GetSpeed()
+    {
+        Vector3 localVelocity = transform.InverseTransformDirection(carRb.velocity);
+        float forwardSpeed = localVelocity.z;
+        currentSpeed = Mathf.Max(forwardSpeed * 3.6f); // Convert m/s to km/h
+        Debug.Log("Current Speed: " + currentSpeed + " km/h");
 
         if (verticalInput > 0 && currentSpeed < maxSpeed)
         {
-            currentSpeed += accelerationRate * Time.deltaTime;
+            //currentSpeed += accelerationRate * Time.deltaTime;
+
+            // Calculate the motor torque based on current speed
+            motorTorque = Mathf.Clamp(verticalInput * maxMotorTorque, 0, maxMotorTorque);
+            // Apply motor torque to the rear wheels
+            backRight.motorTorque = motorTorque;
+            backLeft.motorTorque = motorTorque;
         }
-        else if (verticalInput == 0 || currentSpeed > maxSpeed)
+        else// if (verticalInput == 0 || currentSpeed > maxSpeed)
         {
-            currentSpeed = Mathf.Max(currentSpeed -(accelerationRate * 0.5f * Time.deltaTime), 0);
+            motorTorque = 0;
+            backRight.motorTorque = motorTorque;
+            backLeft.motorTorque = motorTorque;
+            //currentSpeed = Mathf.Max(currentSpeed - (accelerationRate * 0.5f * Time.deltaTime), 0);
 
         }
-        // Convert speed from km/h to m/s for motor torque
-        float speedInMetersPerSecond = currentSpeed / 3.6f;
 
-        // Calculate the motor torque based on current speed
-        motorTorque = Mathf.Clamp(verticalInput * maxMotorTorque, 0, maxMotorTorque);
-
-        // Apply motor torque to the rear wheels
-        backRight.motorTorque = motorTorque;
-        backLeft.motorTorque = motorTorque;
         // Simulate rolling friction by reducing speed when no input is given
         ApplyRollingFriction();
     }
 
     private void ApplyRollingFriction()
     {
-        float rollingResistance = 10f; // Arbitrary value for resistance
-        currentSpeed = Mathf.Max(0f, currentSpeed - rollingResistance * Time.deltaTime);
+        if (carRb.velocity.magnitude > 0)
+        {
+            float rollingResistance = 10f; // Arbitrary value for resistance
+            Vector3 resistanceForce = -carRb.velocity.normalized * rollingResistance;
+            //currentSpeed = Mathf.Max(0f, currentSpeed - rollingResistance * Time.deltaTime);
+            carRb.AddForce(resistanceForce, ForceMode.Acceleration);
+        }
     }
 
     void FixedUpdate()
     {
+        GetSpeed();
         // Get acceleration and decceleration from vertical input
         currentAcceleration = acceleration * verticalInput;
 
@@ -100,23 +108,31 @@ public class CarController : MonoBehaviour
         frontLeft.motorTorque = currentAcceleration;
 
         //Apply brake to all wheels
-        frontRight.brakeTorque = currentBrakeForce;
-        frontLeft.brakeTorque = currentBrakeForce;
-        backRight.brakeTorque = currentBrakeForce;
-        backLeft.brakeTorque = currentBrakeForce;
+        ApplyBrakes(brakingForce);
 
         // Handle steering
-        currentTurnAngle = maxTurnAngle * Input.GetAxis("Horizontal");
-        frontRight.steerAngle = currentTurnAngle;
-        frontLeft.steerAngle = currentTurnAngle;
+        HandleSteering();
 
         //update wheel meshes
         UpdateWheel(frontRight, frontRightTransform);
         UpdateWheel(frontLeft, frontLeftTransform);
         UpdateWheel(backRight, backRightTransform);
         UpdateWheel(backLeft, backLeftTransform);
+    }
 
-        GetSpeed();
+    private void ApplyBrakes(float brakeForce)
+    {
+        frontRight.brakeTorque = brakeForce;
+        frontLeft.brakeTorque = brakeForce;
+        backRight.brakeTorque = brakeForce;
+        backLeft.brakeTorque = brakeForce;
+    }
+
+    private void HandleSteering()
+    {
+        currentTurnAngle = maxTurnAngle * horizontalInput;
+        frontRight.steerAngle = currentTurnAngle;
+        frontLeft.steerAngle = currentTurnAngle;
     }
 
     private void UpdateWheel(WheelCollider wheel, Transform trans)
@@ -132,16 +148,21 @@ public class CarController : MonoBehaviour
         trans.rotation = rotation;
     }
 
-    public void GetSpeed()
+    //Button controls
+    public void Accelerate()
     {
-        // Calculate and display the speed in km/h
-        Vector3 localVelocity = transform.InverseTransformDirection(carRb.velocity);
-        float forwardSpeed = localVelocity.z;
-        currentSpeed = forwardSpeed * 3.6f; // Convert m/s to km/h
-
-        // Visual debugging (optional)
-        Debug.Log("Current Speed: " + currentSpeed + " km/h");
-        //currentSpeed =  carRb.velocity.magnitude;
+        Debug.Log("Accelerating");
+        verticalInput = 1f;
+        accelerationRate = 5f;
+        acceleration = 300f;
     }
-    
+
+    public void StopAccelerate()
+    {
+        Debug.Log("Accelerating");
+        verticalInput = 0f;
+        accelerationRate = 0f;
+        acceleration = 0f;
+    }
+
 }
