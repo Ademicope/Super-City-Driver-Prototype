@@ -20,7 +20,7 @@ public class CarController : MonoBehaviour
 
     public float maxMotorTorque = 2000f;
     //public float acceleration = 300f;
-    public float acceleration = 500f;
+    public float acceleration = 1500f;
     public float brakingForce = 150f;
     public float maxTurnAngle = 30f;
     //public float accelerationRate = 0f;
@@ -31,7 +31,7 @@ public class CarController : MonoBehaviour
     private float currentTurnAngle = 0;
 
     public float currentSpeed = 0;
-    private float motorTorque = 0f;
+    //private float motorTorque = 0f;
 
     private bool isUsingUIBotton = false;
 
@@ -41,6 +41,7 @@ public class CarController : MonoBehaviour
     void Start()
     {
         carRb = GetComponent<Rigidbody>();
+        carRb.velocity = Vector3.zero;
     }
 
     // Update is called once per frame
@@ -55,12 +56,20 @@ public class CarController : MonoBehaviour
 
     public void GetSpeed()
     {
+        Debug.Log("Rigidbody Velocity: " + carRb.velocity);
         Vector3 localVelocity = transform.InverseTransformDirection(carRb.velocity);
         float forwardSpeed = localVelocity.z;
-        currentSpeed = forwardSpeed * 3.6f; // Convert m/s to km/h
+        if (forwardSpeed > 0)
+        {
+            currentSpeed = forwardSpeed * 3.6f; // Convert m/s to km/h
+        }
+        else
+        {
+            currentSpeed = 0;
+        }
         //Debug.Log("Current Speed: " + currentSpeed + " km/h");
 
-        if (verticalInput > 0 && currentSpeed < maxSpeed)
+        /*if (verticalInput > 0 && currentSpeed < maxSpeed)
         {
             Debug.Log($"Vertical Input: {verticalInput}");
             //currentSpeed += accelerationRate * Time.deltaTime;
@@ -74,10 +83,9 @@ public class CarController : MonoBehaviour
         }
         else
         {
-            motorTorque = 0;
-            backRight.motorTorque = motorTorque;
-            backLeft.motorTorque = motorTorque;
-        }
+            backRight.motorTorque = 0;
+            backLeft.motorTorque = 0;
+        }*/
 
         // Simulate rolling friction by reducing speed when no input is given
         ApplyRollingFriction();
@@ -102,19 +110,22 @@ public class CarController : MonoBehaviour
             // Get acceleration and decceleration from vertical input
             currentAcceleration = acceleration * verticalInput;
 
-
-
-            //Apply acceleration to front wheels
-            frontRight.motorTorque = currentAcceleration;
-            frontLeft.motorTorque = currentAcceleration;
+            //Apply acceleration to rear wheels
+            backRight.motorTorque = currentAcceleration;
+            backLeft.motorTorque = currentAcceleration;
         }
-        //Apply brake to all wheels
-        ApplyBrakes(currentBrakeForce);
+        else
+        {
+            //backRight.motorTorque = 0;
+            //backLeft.motorTorque = 0;
+
+            //Apply brake to all wheels
+            ApplyBrakes(currentBrakeForce);
+        }
+        
 
         // Handle steering
         HandleSteering();
-
-        //ApplyRollingFriction();
 
         //update wheel meshes
         UpdateWheelMeshes();
@@ -164,6 +175,8 @@ public class CarController : MonoBehaviour
         UpdateWheel(backRight, backRightTransform);
         UpdateWheel(backLeft, backLeftTransform);
     }
+
+    #region Button controls
     //Button controls
     public void AccelerateButtonDown()
     {
@@ -174,37 +187,45 @@ public class CarController : MonoBehaviour
 
     public void AccelerateButtonup()
     {
+        isUsingUIBotton = true;
         Debug.Log("Stopping");
         verticalInput = 0f;
     }
     
     public void BrakeButtonDown()
     {
+        isUsingUIBotton = true;
         verticalInput = -1f;
     }
 
     public void BrakeButtonUp()
     {
+        isUsingUIBotton = true;
         verticalInput = 0f;
     }
 
     public void RightButtonDown()
     {
+        isUsingUIBotton = true;
         horizontalInput = 1f;
     }
 
     public void LeftButtonDown()
     {
+        isUsingUIBotton = true;
         horizontalInput = -1f;
     }
 
     public void RightButtonUp()
     {
+        isUsingUIBotton = true;
         horizontalInput = 0f;
     }
 
     public void LeftButtonUp()
     {
+        isUsingUIBotton = true;
         horizontalInput = 0f;
     }
+    #endregion
 }

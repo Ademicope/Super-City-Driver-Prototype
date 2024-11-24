@@ -31,7 +31,7 @@ public class GameManager : MonoBehaviour
     {
         //Debug.Log("Speed is " + carController.carSpeed.ToString("F2"));
         speedText.text = "Speed : " + carController.currentSpeed.ToString("F2") + "km/h";
-        coinText.text = "Coins: " + coin.ToString();
+        coinText.text = "Score: " + coin.ToString();
     }
 
     public void ApplyViolationFee(float fee)
