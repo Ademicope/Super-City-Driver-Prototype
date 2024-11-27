@@ -22,7 +22,7 @@ public class CarController : MonoBehaviour
     //public float acceleration = 300f;
     public float acceleration = 1500f;
     public float brakingForce = 150f;
-    public float maxTurnAngle = 30f;
+    public float maxTurnAngle = 60f;
     //public float accelerationRate = 0f;
     public float maxSpeed = 220f;
 
@@ -56,7 +56,7 @@ public class CarController : MonoBehaviour
 
     public void GetSpeed()
     {
-        Debug.Log("Rigidbody Velocity: " + carRb.velocity);
+        //Debug.Log("Rigidbody Velocity: " + carRb.velocity);
         Vector3 localVelocity = transform.InverseTransformDirection(carRb.velocity);
         float forwardSpeed = localVelocity.z;
         if (forwardSpeed > 0)
@@ -67,25 +67,6 @@ public class CarController : MonoBehaviour
         {
             currentSpeed = 0;
         }
-        //Debug.Log("Current Speed: " + currentSpeed + " km/h");
-
-        /*if (verticalInput > 0 && currentSpeed < maxSpeed)
-        {
-            Debug.Log($"Vertical Input: {verticalInput}");
-            //currentSpeed += accelerationRate * Time.deltaTime;
-
-            // Calculate the motor torque based on current speed
-            motorTorque = Mathf.Clamp(verticalInput * maxMotorTorque, 0, maxMotorTorque);
-            // Apply motor torque to the rear wheels
-            backRight.motorTorque = motorTorque;
-            backLeft.motorTorque = motorTorque;
-            
-        }
-        else
-        {
-            backRight.motorTorque = 0;
-            backLeft.motorTorque = 0;
-        }*/
 
         // Simulate rolling friction by reducing speed when no input is given
         ApplyRollingFriction();
@@ -95,7 +76,7 @@ public class CarController : MonoBehaviour
     {
         if (carRb.velocity.magnitude > 0)
         {
-            float rollingResistance = 0.1f; // Arbitrary value for resistance
+            float rollingResistance = 1f; // Arbitrary value for resistance
             Vector3 resistanceForce = -carRb.velocity.normalized * rollingResistance;
             carRb.AddForce(resistanceForce, ForceMode.Acceleration);
         }
@@ -116,9 +97,6 @@ public class CarController : MonoBehaviour
         }
         else
         {
-            //backRight.motorTorque = 0;
-            //backLeft.motorTorque = 0;
-
             //Apply brake to all wheels
             ApplyBrakes(currentBrakeForce);
         }
@@ -196,6 +174,7 @@ public class CarController : MonoBehaviour
     {
         isUsingUIBotton = true;
         verticalInput = -1f;
+        ApplyBrakes(currentBrakeForce);
     }
 
     public void BrakeButtonUp()

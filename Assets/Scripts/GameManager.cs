@@ -9,9 +9,9 @@ public class GameManager : MonoBehaviour
 
     public CarController carController;
 
-    public TextMeshProUGUI speedText, timeText, coinText;
+    public TextMeshProUGUI speedText, timeText, scoreText;
 
-    public float coin = 0;
+    public float score = 0;
 
     public bool isGameOver = false;
     public bool isMoving = false;
@@ -22,6 +22,11 @@ public class GameManager : MonoBehaviour
         if (singleton == null)
         {
             singleton = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else
+        {
+            Destroy(gameObject);
         }
         StartCoroutine(IncreaseCoin());
     }
@@ -31,25 +36,25 @@ public class GameManager : MonoBehaviour
     {
         //Debug.Log("Speed is " + carController.carSpeed.ToString("F2"));
         speedText.text = "Speed : " + carController.currentSpeed.ToString("F2") + "km/h";
-        coinText.text = "Score: " + coin.ToString();
+        scoreText.text = "Score: " + score.ToString();
     }
 
     public void ApplyViolationFee(float fee)
     {
-        coin -= fee;
-        Debug.Log("Coin balance: " + coin);
+        score -= fee;
+        Debug.Log("Score balance: " + score);
     }
     IEnumerator IncreaseCoin()
     {
         
         while (!isGameOver)
         {
-            coinText.text = "Coin: " + coin;
+            scoreText.text = "Score: " + score;
             yield return new WaitForSeconds(1);
             if (carController.currentSpeed > 0)
             {
                 isMoving = true;
-                coin++;
+                score++;
             }
             
         }

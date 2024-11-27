@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TrafficRuleTrigger : MonoBehaviour
 {
-    public enum Rule { SpeedCheck, Red, Yellow, Green, PedestrianCrossing }
+    public enum Rule { SpeedCheck, PedestrianCrossing }
 
     public Rule rule;
 
@@ -14,6 +14,8 @@ public class TrafficRuleTrigger : MonoBehaviour
     public float violationFee = 0;
 
     CarController car;
+
+    public GameObject goLight;
 
     private void Start()
     {
@@ -25,11 +27,13 @@ public class TrafficRuleTrigger : MonoBehaviour
         if (other.CompareTag("Player"))
         {
             car = other.GetComponent<CarController>();
-            if (rule == Rule.PedestrianCrossing)
+            Debug.Log("Player entered the trigger");
+            Debug.Log("goLight status: " + goLight.activeSelf);
+            if (rule == Rule.PedestrianCrossing && (goLight != null && !goLight.activeSelf))
             {
-                violationFee += 5;
-                Debug.Log("Speed violation!! lost 5 coins");
-                NotifyGameManager(violationFee, "Speed violation!! lost 5 coins");
+                violationFee += 15;
+                Debug.Log("Traffic light violation!! lost 10 coins");
+                NotifyGameManager(violationFee, "Traffic light violation!! lost 10 coins");
             }
             if (rule == Rule.SpeedCheck)
             {
@@ -38,12 +42,6 @@ public class TrafficRuleTrigger : MonoBehaviour
                     violationFee += 15;
                     Debug.Log("Speed violation!! lost 5 coins");
                 }
-            }
-            if (rule == Rule.Red || rule == Rule.Yellow)
-            {
-                violationFee += 10;
-                Debug.Log("Traffic light violation!! lost 10 coins");
-                NotifyGameManager(violationFee, "Traffic light violation!! lost 10 coins");
             }
         }
     }
