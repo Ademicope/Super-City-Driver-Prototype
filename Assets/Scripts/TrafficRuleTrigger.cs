@@ -28,7 +28,6 @@ public class TrafficRuleTrigger : MonoBehaviour
         {
             car = other.GetComponent<CarController>();
             Debug.Log("Player entered the trigger");
-            Debug.Log("goLight status: " + goLight.activeSelf);
             if (rule == Rule.PedestrianCrossing && (goLight != null && !goLight.activeSelf))
             {
                 violationFee += 15;

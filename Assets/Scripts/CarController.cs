@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.EventSystems;
 
 public class CarController : MonoBehaviour
 {
@@ -33,7 +34,13 @@ public class CarController : MonoBehaviour
     public float currentSpeed = 0;
     //private float motorTorque = 0f;
 
-    private bool isUsingUIBotton = false;
+    public MyButton acceleratePedal;
+    public MyButton brakePedal;
+    public MyButton leftButton;
+    public MyButton rightButton;
+
+    //public float accelerateInput;
+    public float brakeInput;
 
     private Rigidbody carRb;
 
@@ -47,11 +54,7 @@ public class CarController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (!isUsingUIBotton)
-        {
-            verticalInput = Input.GetAxis("Vertical");
-            horizontalInput = Input.GetAxis("Horizontal");
-        }
+        
     }
 
     public void GetSpeed()
@@ -59,7 +62,7 @@ public class CarController : MonoBehaviour
         //Debug.Log("Rigidbody Velocity: " + carRb.velocity);
         Vector3 localVelocity = transform.InverseTransformDirection(carRb.velocity);
         float forwardSpeed = localVelocity.z;
-        if (forwardSpeed > 0)
+        if (Mathf.Abs(forwardSpeed) > 0.1f)
         {
             currentSpeed = forwardSpeed * 3.6f; // Convert m/s to km/h
         }
@@ -74,7 +77,7 @@ public class CarController : MonoBehaviour
 
     private void ApplyRollingFriction()
     {
-        if (carRb.velocity.magnitude > 0)
+        if (currentBrakeForce == 0 && carRb.velocity.magnitude > 0.1f)
         {
             float rollingResistance = 1f; // Arbitrary value for resistance
             Vector3 resistanceForce = -carRb.velocity.normalized * rollingResistance;
@@ -85,22 +88,30 @@ public class CarController : MonoBehaviour
     void FixedUpdate()
     {
         GetSpeed();
-
+        GetInput();
         if (verticalInput > 0)
         {
             // Get acceleration and decceleration from vertical input
             currentAcceleration = acceleration * verticalInput;
 
-            //Apply acceleration to rear wheels
-            backRight.motorTorque = currentAcceleration;
-            backLeft.motorTorque = currentAcceleration;
+            //Apply acceleration to rear wheels & clamp motor torque
+            if (currentSpeed < maxSpeed)
+            {
+                backRight.motorTorque = currentAcceleration;
+                backLeft.motorTorque = currentAcceleration;
+                currentBrakeForce = 0;
+            }
+            else
+            {
+                backRight.motorTorque = 0;
+                backLeft.motorTorque = 0;
+            }
         }
         else
         {
             //Apply brake to all wheels
-            ApplyBrakes(currentBrakeForce);
+            ApplyBrakes();
         }
-        
 
         // Handle steering
         HandleSteering();
@@ -109,11 +120,50 @@ public class CarController : MonoBehaviour
         UpdateWheelMeshes();
     }
 
-    private void ApplyBrakes(float brakeForce)
+    private void GetInput()
     {
-        if (Input.GetKey(KeyCode.Space) || verticalInput < 0)
+        verticalInput = Input.GetAxis("Vertical");
+        if (acceleratePedal.isPressed)
+        {
+            verticalInput += acceleratePedal.dampenPress;
+        }
+        if (brakePedal.isPressed)
+        {
+            verticalInput -= brakePedal.dampenPress;
+        }
+        horizontalInput = Input.GetAxis("Horizontal");
+        if (rightButton.isPressed)
+        {
+            horizontalInput += rightButton.dampenPress;
+        }
+        if (leftButton.isPressed)
+        {
+            horizontalInput -= leftButton.dampenPress;
+        }
+
+        //reversing
+        float movingDirection = Vector3.Dot(transform.forward, carRb.velocity);
+        if (movingDirection < -0.5f && verticalInput > 0)
+        {
+            brakeInput = Mathf.Abs(verticalInput);
+        }
+        else if (movingDirection > 0.5f && verticalInput < 0)
+        {
+            brakeInput = Mathf.Abs(verticalInput);
+        }
+        else
+        {
+            brakeInput = 0;
+        }
+    }
+
+    private void ApplyBrakes()
+    {
+        if (brakePedal.isPressed || verticalInput < 0 || Input.GetKey(KeyCode.Space))
         {
             currentBrakeForce = brakingForce;
+            backRight.motorTorque = 0;
+            backLeft.motorTorque = 0;
         }
         else
         {
@@ -124,6 +174,12 @@ public class CarController : MonoBehaviour
         frontLeft.brakeTorque = currentBrakeForce;
         backRight.brakeTorque = currentBrakeForce;
         backLeft.brakeTorque = currentBrakeForce;
+
+        if (carRb.velocity.magnitude < 0.1f)
+        {
+            carRb.velocity = Vector3.zero;
+            carRb.angularVelocity = Vector3.zero;
+        }
     }
 
     private void HandleSteering()
@@ -154,57 +210,4 @@ public class CarController : MonoBehaviour
         UpdateWheel(backLeft, backLeftTransform);
     }
 
-    #region Button controls
-    //Button controls
-    public void AccelerateButtonDown()
-    {
-        isUsingUIBotton = true;
-        Debug.Log("Accelerating");
-        verticalInput = 1f;
-    }
-
-    public void AccelerateButtonup()
-    {
-        isUsingUIBotton = true;
-        Debug.Log("Stopping");
-        verticalInput = 0f;
-    }
-    
-    public void BrakeButtonDown()
-    {
-        isUsingUIBotton = true;
-        verticalInput = -1f;
-        ApplyBrakes(currentBrakeForce);
-    }
-
-    public void BrakeButtonUp()
-    {
-        isUsingUIBotton = true;
-        verticalInput = 0f;
-    }
-
-    public void RightButtonDown()
-    {
-        isUsingUIBotton = true;
-        horizontalInput = 1f;
-    }
-
-    public void LeftButtonDown()
-    {
-        isUsingUIBotton = true;
-        horizontalInput = -1f;
-    }
-
-    public void RightButtonUp()
-    {
-        isUsingUIBotton = true;
-        horizontalInput = 0f;
-    }
-
-    public void LeftButtonUp()
-    {
-        isUsingUIBotton = true;
-        horizontalInput = 0f;
-    }
-    #endregion
 }
