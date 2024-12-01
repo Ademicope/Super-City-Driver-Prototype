@@ -35,6 +35,7 @@ public class CarController : MonoBehaviour
     //private float motorTorque = 0f;
 
     public MyButton acceleratePedal;
+    public MyButton reversePedal;
     public MyButton brakePedal;
     public MyButton leftButton;
     public MyButton rightButton;
@@ -89,13 +90,18 @@ public class CarController : MonoBehaviour
     {
         GetSpeed();
         GetInput();
-        if (verticalInput > 0)
+
+        if (brakePedal.isPressed || Input.GetKey(KeyCode.Space))
+        {
+            ApplyBrakes();
+        }
+        else if (Mathf.Abs(verticalInput) > 0.01f)
         {
             // Get acceleration and decceleration from vertical input
             currentAcceleration = acceleration * verticalInput;
 
             //Apply acceleration to rear wheels & clamp motor torque
-            if (currentSpeed < maxSpeed)
+            if (currentSpeed < maxSpeed || verticalInput < 0)
             {
                 backRight.motorTorque = currentAcceleration;
                 backLeft.motorTorque = currentAcceleration;
@@ -106,6 +112,11 @@ public class CarController : MonoBehaviour
                 backRight.motorTorque = 0;
                 backLeft.motorTorque = 0;
             }
+            // Clear brake torque
+            frontRight.brakeTorque = 0;
+            frontLeft.brakeTorque = 0;
+            backRight.brakeTorque = 0;
+            backLeft.brakeTorque = 0;
         }
         else
         {
@@ -127,10 +138,11 @@ public class CarController : MonoBehaviour
         {
             verticalInput += acceleratePedal.dampenPress;
         }
-        if (brakePedal.isPressed)
+        if (reversePedal.isPressed)
         {
-            verticalInput -= brakePedal.dampenPress;
+            verticalInput -= reversePedal.dampenPress;
         }
+
         horizontalInput = Input.GetAxis("Horizontal");
         if (rightButton.isPressed)
         {
@@ -159,27 +171,22 @@ public class CarController : MonoBehaviour
 
     private void ApplyBrakes()
     {
-        if (brakePedal.isPressed || verticalInput < 0 || Input.GetKey(KeyCode.Space))
-        {
-            currentBrakeForce = brakingForce;
-            backRight.motorTorque = 0;
-            backLeft.motorTorque = 0;
-        }
-        else
-        {
-            currentBrakeForce = 0;
-        }
+        currentBrakeForce = brakingForce;
 
         frontRight.brakeTorque = currentBrakeForce;
         frontLeft.brakeTorque = currentBrakeForce;
         backRight.brakeTorque = currentBrakeForce;
         backLeft.brakeTorque = currentBrakeForce;
 
-        if (carRb.velocity.magnitude < 0.1f)
+        if (carRb.velocity.magnitude < 0.1f && currentBrakeForce > 0)
         {
             carRb.velocity = Vector3.zero;
             carRb.angularVelocity = Vector3.zero;
         }
+
+        // Ensure no motor torque while braking
+        backRight.motorTorque = 0;
+        backLeft.motorTorque = 0;
     }
 
     private void HandleSteering()
