@@ -22,8 +22,8 @@ public class CarController : MonoBehaviour
     public float maxMotorTorque = 2000f;
     //public float acceleration = 300f;
     public float acceleration = 1500f;
-    public float brakingForce = 150f;
-    public float maxTurnAngle = 60f;
+    public float brakingForce = 300f;
+    public float maxTurnAngle = 90f;
     //public float accelerationRate = 0f;
     public float maxSpeed = 220f;
 
@@ -44,6 +44,8 @@ public class CarController : MonoBehaviour
     public float brakeInput;
 
     private Rigidbody carRb;
+    //public TrafficRuleTrigger trafficRuleTrigger;
+    //public GameManager gameManager;
 
     // Start is called before the first frame update
     void Start()
