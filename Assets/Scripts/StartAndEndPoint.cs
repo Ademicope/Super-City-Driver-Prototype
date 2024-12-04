@@ -7,9 +7,12 @@ public class StartAndEndPoint : MonoBehaviour
     public List<GameObject> startLocations = new List<GameObject>();
     public List<GameObject> destination = new List<GameObject>();
 
-    public GameObject car;
-
     public bool isReachDestination = false;
+
+    public GameManager gameManager;
+
+    GameObject destinationPoint;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -34,10 +37,18 @@ public class StartAndEndPoint : MonoBehaviour
         int destinationIndex = Random.Range(0, destination.Count);
 
         GameObject startPoint = startLocations[startIndex];
-        GameObject destinationPoint = destination[destinationIndex];
+        destinationPoint = destination[destinationIndex];
 
-        car.transform.position = startPoint.transform.position;
-        car.transform.rotation = startPoint.transform.rotation;
+        transform.position = startPoint.transform.position;
+        transform.rotation = startPoint.transform.rotation;
+    }
 
+    void OnTriggerEnter(Collider other)
+    {
+        if (other.gameObject == destinationPoint)
+        {
+            isReachDestination = true;
+            gameManager.GameWon();
+        }
     }
 }

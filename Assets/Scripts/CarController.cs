@@ -173,7 +173,7 @@ public class CarController : MonoBehaviour
 
     private void ApplyBrakes()
     {
-        currentBrakeForce = brakingForce;
+        currentBrakeForce = brakingForce * 2;
 
         frontRight.brakeTorque = currentBrakeForce;
         frontLeft.brakeTorque = currentBrakeForce;

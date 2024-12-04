@@ -13,6 +13,8 @@ public class GameManager : MonoBehaviour
 
     public GameObject startMenu;
     public GameObject gameOverPanel;
+    public GameObject missionCompletePanel;
+    public GameObject scorePanel;
     public Button restartButton;
     public Button startButton;
 
@@ -39,6 +41,7 @@ public class GameManager : MonoBehaviour
         }
         startMenu.SetActive(true);
         gameOverPanel.SetActive(false);
+        scorePanel.SetActive(false);
         startButton.onClick.AddListener(StartGame);
         restartButton.onClick.AddListener(RestartGame);
         Time.timeScale = 0f;
@@ -48,7 +51,6 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log("Speed is " + carController.carSpeed.ToString("F2"));
         speedText.text = "Speed : " + carController.currentSpeed.ToString("F2") + "km/h";
         scoreText.text = "Score: " + score.ToString();
         violationText.text = "Violations: " + violationCount.ToString();
@@ -83,6 +85,7 @@ public class GameManager : MonoBehaviour
     public void StartGame()
     {
         startMenu.SetActive(false);
+        scorePanel.SetActive(true);
         Time.timeScale = 1.0f;
         isGameOver = false;
     }
@@ -99,6 +102,15 @@ public class GameManager : MonoBehaviour
         car.velocity = Vector3.zero;
         gameOverText.gameObject.SetActive(true);
         gameOverPanel.SetActive(true);
+        Time.timeScale = 0f;
+    }
+
+    public void GameWon()
+    {
+        isGameOver = true;
+        car.velocity = Vector3.zero;
+        //gameOverText.gameObject.SetActive(true);
+        missionCompletePanel.SetActive(true);
         Time.timeScale = 0f;
     }
 }
