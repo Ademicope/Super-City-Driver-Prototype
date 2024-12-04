@@ -127,6 +127,7 @@ MonoBehaviour:
   stopDuration: 3
   violationFee: 0
   goLight: {fileID: 2508751565028523744}
+  gameManager: {fileID: 0}
 --- !u!114 &2704603871757455682
 MonoBehaviour:
   m_ObjectHideFlags: 0

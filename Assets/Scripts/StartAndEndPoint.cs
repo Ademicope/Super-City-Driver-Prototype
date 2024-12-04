@@ -48,6 +48,7 @@ public class StartAndEndPoint : MonoBehaviour
         if (other.gameObject == destinationPoint)
         {
             isReachDestination = true;
+            Debug.Log("destination reached");
             gameManager.GameWon();
         }
     }

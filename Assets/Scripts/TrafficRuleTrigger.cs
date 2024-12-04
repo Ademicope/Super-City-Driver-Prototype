@@ -17,9 +17,12 @@ public class TrafficRuleTrigger : MonoBehaviour
 
     public GameObject goLight;
 
+    public GameManager gameManager;
+
     private void Start()
     {
-
+        if (gameManager == null)
+            gameManager = GameObject.FindObjectOfType<GameManager>();
     }
 
     private void OnTriggerEnter(Collider other)
@@ -30,7 +33,7 @@ public class TrafficRuleTrigger : MonoBehaviour
             Debug.Log("Player entered the trigger");
             if (rule == Rule.PedestrianCrossing && (goLight != null && !goLight.activeSelf))
             {
-                violationFee += 15;
+                violationFee += 10;
                 Debug.Log("Traffic light violation!! lost 10 coins");
                 NotifyGameManager(violationFee, "Traffic light violation!! lost 10 coins");
             }
@@ -38,7 +41,7 @@ public class TrafficRuleTrigger : MonoBehaviour
             {
                 if (car != null && car.currentSpeed > maxAllowedSpeed)
                 {
-                    violationFee += 15;
+                    violationFee += 5;
                     Debug.Log("Speed violation!! lost 5 coins");
                 }
             }
@@ -47,9 +50,9 @@ public class TrafficRuleTrigger : MonoBehaviour
 
     private void NotifyGameManager(float fee, string message)
     {
-        if (GameManager.singleton != null)
+        if (gameManager != null)
         {
-            GameManager.singleton.ApplyViolationFee(fee);
+            gameManager.ApplyViolationFee(fee);
             Debug.Log(message);
         }
     }
