@@ -19,6 +19,7 @@ public class GameManager : MonoBehaviour
     public Button startButton;
 
     public TextMeshProUGUI speedText, timeText, scoreText, gameOverText, violationText;
+    public GameObject violationPanel;
     public Rigidbody car;
     public float score = 0;
 
@@ -27,13 +28,19 @@ public class GameManager : MonoBehaviour
 
     public float violationCount = 0;
 
-    private AudioSource gameAudio;
-    public AudioClip carSound, gameSound;
+    public AudioSource gameAudio;
+    public AudioClip gameSound;
+    public AudioClip moveSound, startSound;
+
+    public ParticleSystem smoke;
 
     // Start is called before the first frame update
     void Start()
     {
-        gameAudio = GetComponent<AudioSource>();
+        if (gameAudio == null)
+        {
+            gameAudio = GetComponent<AudioSource>();
+        }
         startMenu.SetActive(true);
         gameOverPanel.SetActive(false);
         scorePanel.SetActive(false);
@@ -64,12 +71,20 @@ public class GameManager : MonoBehaviour
     {
         score -= fee;
         violationCount++;
-
+        StartCoroutine(ShowViolation());
         scoreText.text = "Score: " + score.ToString();
         violationText.text = "Violations: " + violationCount.ToString();
 
         Debug.Log("Score balance: " + score);
     }
+
+    IEnumerator ShowViolation()
+    {
+        violationPanel.SetActive(true);
+        yield return new WaitForSeconds(1);
+        violationPanel.SetActive(false);
+    }
+
     IEnumerator IncreaseCoin()
     {
         while (!isGameOver)
@@ -82,6 +97,16 @@ public class GameManager : MonoBehaviour
                 score++;
             }
             
+        }
+    }
+
+    private void SoundAndEffects()
+    {
+        if (isMoving)
+        {
+            gameAudio.clip = moveSound;
+            gameAudio.Play();
+            smoke.Play();
         }
     }
 
@@ -98,7 +123,7 @@ public class GameManager : MonoBehaviour
 
     public void RestartGame()
     {
-        Time.timeScale = 1f;
+        //Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 

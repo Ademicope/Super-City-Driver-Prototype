@@ -278,6 +278,8 @@ MonoBehaviour:
   - {fileID: 0}
   isReachDestination: 0
   gameManager: {fileID: 0}
+  carPointer: {fileID: 0}
+  destinationPointer: {fileID: 0}
 --- !u!1 &4924548149887227591
 GameObject:
   m_ObjectHideFlags: 0

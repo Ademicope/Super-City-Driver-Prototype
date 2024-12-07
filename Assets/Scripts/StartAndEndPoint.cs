@@ -82,10 +82,10 @@ public class StartAndEndPoint : MonoBehaviour
     private void UpdatePointerPositionsAndDirection()
     {
         // Position the car pointer slightly above the car for visibility
-        carPointer.transform.position = transform.position + Vector3.up * 5f;
+        carPointer.transform.position = transform.position + Vector3.up * 3f;
 
         // Position the destination pointer slightly above the destination point
-        destinationPointer.transform.position = destinationPoint.transform.position + Vector3.up * 5f;
+        destinationPointer.transform.position = destinationPoint.transform.position + Vector3.up * 3f;
 
         // Calculate direction from the car to the destination
         Vector3 directionToDestination = destinationPoint.transform.position - transform.position;

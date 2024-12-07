@@ -10,27 +10,27 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: -8679921383154817045, guid: aabedb538eb386543b0390e257ab5410, type: 3}
       propertyPath: m_LocalScale.x
-      value: 100
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: aabedb538eb386543b0390e257ab5410, type: 3}
       propertyPath: m_LocalScale.y
-      value: 100
+      value: 300
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: aabedb538eb386543b0390e257ab5410, type: 3}
       propertyPath: m_LocalScale.z
-      value: 100
+      value: 1000
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: aabedb538eb386543b0390e257ab5410, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0
+      value: 56
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: aabedb538eb386543b0390e257ab5410, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0
+      value: 2.86
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: aabedb538eb386543b0390e257ab5410, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 96
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: aabedb538eb386543b0390e257ab5410, type: 3}
       propertyPath: m_LocalRotation.w
@@ -60,6 +60,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: -7511558181221131132, guid: aabedb538eb386543b0390e257ab5410, type: 3}
+      propertyPath: m_Materials.Array.data[0]
+      value: 
+      objectReference: {fileID: 2100000, guid: 6520c4a3842c14844b42829ba2331c1d, type: 2}
     - target: {fileID: 919132149155446097, guid: aabedb538eb386543b0390e257ab5410, type: 3}
       propertyPath: m_Name
       value: Redarrow

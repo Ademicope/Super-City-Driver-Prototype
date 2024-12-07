@@ -40,6 +40,8 @@ public class CarController : MonoBehaviour
     public MyButton leftButton;
     public MyButton rightButton;
 
+    
+
     //public float accelerateInput;
     public float brakeInput;
 
@@ -68,6 +70,7 @@ public class CarController : MonoBehaviour
         if (Mathf.Abs(forwardSpeed) > 0.1f)
         {
             currentSpeed = forwardSpeed * 3.6f; // Convert m/s to km/h
+            
         }
         else
         {
@@ -77,6 +80,8 @@ public class CarController : MonoBehaviour
         // Simulate rolling friction by reducing speed when no input is given
         ApplyRollingFriction();
     }
+
+    
 
     private void ApplyRollingFriction()
     {
